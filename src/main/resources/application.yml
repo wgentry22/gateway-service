@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: gateway-server
+zuul:
+  ignoredServices: '*'
+  routes:
+    application-service:
+      path: /application-service/**
+      serviceId: application-service
+    authentication-service:
+      path: /authentication-service/**
+      serviceId: authentication-service
+    hystrix:
+      path: /hystrix/**
+      serviceId: hystrix
+eureka:
+  client:
+    fetchRegistry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka

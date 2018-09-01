@@ -26,12 +26,14 @@ public class PreFilter extends ZuulFilter {
 	public Object run() {
 		RequestContext context = RequestContext.getCurrentContext();
 		HttpServletRequest request = context.getRequest();
+		HttpServletResponse response = context.getResponse();
 		log.info("Value of requestHeader: " + request.getHeader(JwtConstants.HEADER_STRING));
 		String token = request.getHeader(JwtConstants.HEADER_STRING);
-		
+		log.info("Value of responseHeader: " + response.getHeader(JwtConstants.HEADER_STRING));
+		String responseToken = context.getResponseBody();
 		log.info("Inside PreFilter.run() method... " + context.getRequest().getMethod() + " going to " + context.getRequest().getRequestURI());
 		log.info("Setting Authorization header...");
-		context.getZuulRequestHeaders().put(JwtConstants.HEADER_STRING, token);
+		context.getZuulRequestHeaders().put(JwtConstants.HEADER_STRING, responseToken);
 		log.info("Authorization Request Header Sent Out: " + context.getZuulRequestHeaders().get(JwtConstants.HEADER_STRING));
 		return null;
 	}

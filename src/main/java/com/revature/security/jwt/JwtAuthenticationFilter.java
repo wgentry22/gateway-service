@@ -53,12 +53,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            logger.info("Value of UserDetails: " + userDetails.toString());
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenUtil.getAuthentication(authToken, SecurityContextHolder.getContext().getAuthentication(), userDetails);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 logger.info("authenticated user " + username + ", setting security context");
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 res.addHeader(JwtConstants.HEADER_STRING, JwtConstants.TOKEN_PREFIX + authToken);
+                logger.info("Outgoing JWT Token: " + JwtConstants.TOKEN_PREFIX + authToken);
+                
             }
         }
         chain.doFilter(req, res);

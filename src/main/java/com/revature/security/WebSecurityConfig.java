@@ -27,17 +27,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 * @author William
 	 */
 	
-	// Old Configuration
-//	@Autowired
-//	private UserDetailsServiceImpl userDetailsService;
-	
-//	@Autowired
-//	private CustomAuthenticationProvider authProvider;
-	
-//	@Autowired
-//	private JwtAuthenticationEntryPoint unauthorizedHandler;
-	
-	// New Configuration
 	@Autowired
 	private CustomUserDetailsService customUserDetailsService; 
 	
@@ -56,25 +45,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.authenticationProvider(authProvider());
 	}
 	
-	// Old Configuration
-//	@Override
-//	protected void configure(HttpSecurity http) throws Exception {
-//		http
-//			.authorizeRequests().antMatchers("/login", "/favicon.ico", "/webjars**").anonymous().anyRequest().permitAll();
-//		http
-//			.cors().and().csrf().disable()
-//			.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-//			.authorizeRequests().antMatchers(HttpMethod.POST, "/generate-token").permitAll();
-//	}
-	
-	// New Configuration
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.cors().and().csrf().disable()
 			.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.authorizeRequests().antMatchers(HttpMethod.GET, "/login.html").permitAll()
-//			.formLogin().loginPage("/login.html").loginProcessingUrl("/generate-token").defaultSuccessUrl("/application-service")
 			.and()
 			.authorizeRequests().antMatchers(HttpMethod.POST, "/generate-token").permitAll();
 	}

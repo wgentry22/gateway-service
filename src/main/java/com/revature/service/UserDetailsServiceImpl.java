@@ -27,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(final String incomingUsername) throws UsernameNotFoundException {
-		if (!incomingUsername.contains(" "))
+		if (incomingUsername == null)
 			throw new UsernameNotFoundException("Invalid Authentication Request");
 		else {
 			final String[] credentials = incomingUsername.split(" ");

@@ -11,12 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.revature.security.CustomUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -27,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	 * @author William
 	 */
 	@Autowired
-	private UserDetailsService userDetailsService;
+	private CustomUserDetailsService customUserDetailsService;
 	
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
@@ -52,18 +54,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.warn("couldn't find bearer string, will ignore the header");
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = customUserDetailsService.loadByUsername(username);
             logger.info("Value of UserDetails: " + userDetails.toString());
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = jwtTokenUtil.getAuthentication(authToken, SecurityContextHolder.getContext().getAuthentication(), userDetails);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
                 logger.info("authenticated user " + username + ", setting security context");
+                userDetails.getAuthorities().stream().forEach(auth -> logger.info("Granted Authority: " + auth.getAuthority()));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                res.addHeader(JwtConstants.HEADER_STRING, JwtConstants.TOKEN_PREFIX + authToken);
                 logger.info("Outgoing JWT Token: " + JwtConstants.TOKEN_PREFIX + authToken);
-                
             }
         }
+        res.addHeader("Accept", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
         chain.doFilter(req, res);
     }
 

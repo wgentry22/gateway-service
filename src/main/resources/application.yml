@@ -7,12 +7,12 @@ zuul:
     application-service:
       path: /application-service/**
       serviceId: application-service
-    authentication-service:
-      path: /authentication-service/**
-      serviceId: authentication-service
     hystrix:
       path: /hystrix/**
       serviceId: hystrix
+    expense-service:
+      path: /expense/**
+      serviceId: expense-service
 eureka:
   client:
     fetchRegistry: true

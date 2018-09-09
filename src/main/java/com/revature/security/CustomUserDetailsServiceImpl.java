@@ -22,8 +22,23 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 	@Override
 	public UserDetails loadByUsernameAndPassword(String username, String password) throws UsernameNotFoundException {
 		User user = userRepository.findByUsername(username);
+		if (user == null) 
+			throw new UsernameNotFoundException("Invalid Credentials");
 		if (passwordEncoder.matches(password, user.getPassword())) {
 			UserBuilder builder = org.springframework.security.core.userdetails.User.withUsername(username);
+			builder.password(user.getPassword());
+			builder.disabled(!user.isEnabled());
+			builder.authorities(user.getAuthorities().stream().map(auth -> auth.getAuthority()).toArray(String[]::new));
+			return builder.build();
+		}
+		throw new UsernameNotFoundException("Invalid Credentials");
+	}
+	
+	@Override
+	public UserDetails loadByUsername(String username) throws UsernameNotFoundException {
+		User user = userRepository.findByUsername(username);
+		if (user != null) {
+			UserBuilder builder = org.springframework.security.core.userdetails.User.withUsername(user.getUsername());
 			builder.password(user.getPassword());
 			builder.disabled(!user.isEnabled());
 			builder.authorities(user.getAuthorities().stream().map(auth -> auth.getAuthority()).toArray(String[]::new));

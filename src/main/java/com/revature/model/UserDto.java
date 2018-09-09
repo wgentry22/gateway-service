@@ -5,6 +5,10 @@ public class UserDto {
 	private String username;
 	private String password;
 	
+	public UserDto() {
+		super();
+	}
+	
 	public UserDto(String username, String password) {
 		super();
 		this.username = username;

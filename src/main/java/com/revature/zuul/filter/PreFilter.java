@@ -1,8 +1,5 @@
 package com.revature.zuul.filter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
@@ -25,15 +22,14 @@ public class PreFilter extends ZuulFilter {
 	@Override
 	public Object run() {
 		RequestContext context = RequestContext.getCurrentContext();
-		HttpServletRequest request = context.getRequest();
-		HttpServletResponse response = context.getResponse();
-		log.info("Value of requestHeader: " + request.getHeader(JwtConstants.HEADER_STRING));
-		String token = request.getHeader(JwtConstants.HEADER_STRING);
-		log.info("Value of responseHeader: " + response.getHeader(JwtConstants.HEADER_STRING));
-		String responseToken = context.getResponseBody();
+		String responseToken = context.getResponse().getHeader(JwtConstants.HEADER_STRING);
+		String requestToken = context.getRequest().getHeader(JwtConstants.HEADER_STRING);
 		log.info("Inside PreFilter.run() method... " + context.getRequest().getMethod() + " going to " + context.getRequest().getRequestURI());
+		System.err.println("Request Header: " + requestToken);
+		System.err.println("Response Header: " + responseToken);
 		log.info("Setting Authorization header...");
-		context.getZuulRequestHeaders().put(JwtConstants.HEADER_STRING, responseToken);
+		final String token = context.getRequest().getHeader(JwtConstants.HEADER_STRING) != null ? context.getRequest().getHeader(JwtConstants.HEADER_STRING) : context.getResponse().getHeader(JwtConstants.HEADER_STRING);
+		context.getZuulRequestHeaders().put(JwtConstants.HEADER_STRING, token);
 		log.info("Authorization Request Header Sent Out: " + context.getZuulRequestHeaders().get(JwtConstants.HEADER_STRING));
 		return null;
 	}
@@ -45,6 +41,6 @@ public class PreFilter extends ZuulFilter {
 
 	@Override
 	public int filterOrder() {
-		return 1;
+		return 2;
 	}
 }

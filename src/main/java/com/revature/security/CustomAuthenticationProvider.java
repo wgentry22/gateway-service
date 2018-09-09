@@ -27,6 +27,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		System.err.println("Inside CustomAuthenticationProvider...");
 		String username = authentication.getName();
 		String password = authentication.getCredentials().toString();
 		User user = userRepository.findByUsername(username);
@@ -39,6 +40,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 			final List<GrantedAuthority> grantedAuthorities = authorized.getAuthorities().stream().map(a -> new SimpleGrantedAuthority(a.getAuthority())).collect(Collectors.toList());
 			final org.springframework.security.core.userdetails.UserDetails principal = new org.springframework.security.core.userdetails.User(username, password, grantedAuthorities);
 			final Authentication auth = new UsernamePasswordAuthenticationToken(principal.getUsername(), principal.getPassword(), principal.getAuthorities());
+			System.err.println("CustomAuthenticationProvider.getPrincipal(): " + auth.getPrincipal());
+			System.err.println("CustomAuthenticationProvider.getCredentials(): " + auth.getCredentials());
+			System.err.println("CustomAuthenticationProvider.getAuthorities(): " + auth.getAuthorities());
 			return auth;
 		} else {
 			System.out.println("Something went wrong in CustomAuthenticationProvider....");
@@ -49,10 +53,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public boolean supports(Class<?> authentication) {
 		return authentication.equals(UsernamePasswordAuthenticationToken.class);
-	}
-	
-	public boolean passwordsMatch(String rawPassword) {
-		return passwordEncoder.matches(rawPassword, passwordEncoder.encode(rawPassword));
 	}
 
 }
